@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  keycloak-authorization-server:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-latest}
+    hostname: keycloak-server
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./.env
+    command:
+      - "-b 0.0.0.0"
+      - "-Dkeycloak.import=/opt/jboss/keycloak/realm-export.json"
+    volumes:
+      - ./realm-export.json:/opt/jboss/keycloak/realm-export.json
+    depends_on:
+      - postgres-app-db
+    networks:
+      - ${GLOBAL_NETWORK:-services}

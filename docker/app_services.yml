@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  app-order-service:
+    image: docker.io/library/app.product.service:${SERVICE_VERSION:-latest}
+    volumes:
+      - "./check-config-server-started.sh:/usr/local/bin/check-config-server-started.sh"
+      - "./check-keycloak-server-started.sh:/usr/local/bin/check-keycloak-server-started.sh"
+    entrypoint: [ "check-config-server-started.sh" ]
+    depends_on:
+      - cloud-config-service
+      - postgres-app-db
+    networks:
+      - ${GLOBAL_NETWORK:-services}
+  app-product-service:
+    image: docker.io/library/app.order.service:${SERVICE_VERSION:-latest}
+    volumes:
+      - "./check-config-server-started.sh:/usr/local/bin/check-config-server-started.sh"
+      - "./check-keycloak-server-started.sh:/usr/local/bin/check-keycloak-server-started.sh"
+    entrypoint: [ "check-config-server-started.sh" ]
+    depends_on:
+      - cloud-config-service
+      - mongodb_container
+    networks:
+      - ${GLOBAL_NETWORK:-services}

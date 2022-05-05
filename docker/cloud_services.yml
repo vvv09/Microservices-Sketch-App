@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  cloud-config-service:
+    image: docker.io/library/cloud.config.service:${SERVICE_VERSION:-latest}
+    ports:
+      - 8888:8888
+    networks:
+      - ${GLOBAL_NETWORK:-services}
+  cloud-discovery-service:
+    image: docker.io/library/cloud.discovery.service:${SERVICE_VERSION:-latest}
+    ports:
+      - 8761:8761
+    networks:
+      - ${GLOBAL_NETWORK:-services}
+  cloud-api-gateway-service:
+    image: docker.io/library/cloud.api.gateway.service:${SERVICE_VERSION:-latest}
+    ports:
+      - 8080:8080
+    volumes:
+      - "./check-config-server-started.sh:/usr/local/bin/check-config-server-started.sh"
+      - "./check-keycloak-server-started.sh:/usr/local/bin/check-keycloak-server-started.sh"
+    entrypoint: [ "check-config-server-started.sh" ]
+    depends_on:
+      - cloud-config-service
+    networks:
+      - ${GLOBAL_NETWORK:-services}
